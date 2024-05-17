@@ -22,7 +22,7 @@ def transcribe():
         # Make a speech:recognize request using Google Cloud Speech-to-Text API
         config = speech.RecognitionConfig(
             encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
-            sample_rate_hertz=16000,
+            sample_rate_hertz=48000,
             language_code="en-US"  # Adjust language code as needed
         )
         audio = speech.RecognitionAudio(content=audio_data)
