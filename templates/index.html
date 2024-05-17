@@ -98,24 +98,26 @@
         });
 
         function sendAudioToServer(audioBlob) {
-            const formData = new FormData();
-            formData.append('audioFile', audioBlob, 'recording.webm');
-
-            fetch('/transcribe', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                const transcription = data.transcription || 'No transcription available';
-                const transcriptionEntry = document.createElement('div');
-                transcriptionEntry.className = 'transcriptionEntry';
-                transcriptionEntry.textContent = transcription;
-                transcriptionHistory.appendChild(transcriptionEntry);
-                transcriptionHistory.scrollTop = transcriptionHistory.scrollHeight; // Scroll to bottom
-            })
-            .catch(error => {
-                console.error('Error:', error);
+            audioBlob.arrayBuffer().then(arrayBuffer => {
+                fetch('/transcribe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/octet-stream'
+                    },
+                    body: arrayBuffer
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const transcription = data.transcription || 'No transcription available';
+                    const transcriptionEntry = document.createElement('div');
+                    transcriptionEntry.className = 'transcriptionEntry';
+                    transcriptionEntry.textContent = transcription;
+                    transcriptionHistory.appendChild(transcriptionEntry);
+                    transcriptionHistory.scrollTop = transcriptionHistory.scrollHeight; // Scroll to bottom
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
             });
         }
     </script>
