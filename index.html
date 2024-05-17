@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech-to-Text</title>
+</head>
+<body>
+    <h1>Speech-to-Text</h1>
+    <button id="recordButton">Record</button>
+    <button id="stopButton" style="display: none;">Stop</button>
+    <button id="transcribeButton" style="display: none;">Transcribe</button>
+    <div id="transcriptionResult"></div>
+
+    <script>
+        const recordButton = document.getElementById('recordButton');
+        const stopButton = document.getElementById('stopButton');
+        const transcribeButton = document.getElementById('transcribeButton');
+        const transcriptionResult = document.getElementById('transcriptionResult');
+        let recorder;
+        let audioChunks = [];
+
+        recordButton.addEventListener('click', startRecording);
+
+        function startRecording() {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    recorder = new MediaRecorder(stream);
+                    recordButton.style.display = 'none';
+                    stopButton.style.display = 'inline-block';
+                    transcribeButton.style.display = 'none';
+                    
+                    recorder.addEventListener('dataavailable', event => {
+                        audioChunks.push(event.data);
+                    });
+
+                    recorder.addEventListener('stop', () => {
+                        recordButton.style.display = 'inline-block';
+                        stopButton.style.display = 'none';
+                        transcribeButton.style.display = 'inline-block';
+                    });
+
+                    recorder.start();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        stopButton.addEventListener('click', () => {
+            if (recorder && recorder.state === 'recording') {
+                recorder.stop();
+            }
+        });
+
+        transcribeButton.addEventListener('click', () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            sendAudioToServer(audioBlob);
+        });
+
+        function sendAudioToServer(audioBlob) {
+            const formData = new FormData();
+            formData.append('audioFile', audioBlob, 'recording.wav');
+
+            fetch('/transcribe', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                transcriptionResult.textContent = data.transcription || 'No transcription available';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                transcriptionResult.textContent = 'Error occurred during transcription';
+            });
+        }
+    </script>
+</body>
+</html>
