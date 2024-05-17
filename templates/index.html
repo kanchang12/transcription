@@ -30,6 +30,7 @@
                     stopButton.style.display = 'inline-block';
                     transcribeButton.style.display = 'none';
                     
+                    audioChunks = [];  // Reset the audioChunks array
                     recorder.addEventListener('dataavailable', event => {
                         audioChunks.push(event.data);
                     });
@@ -54,13 +55,13 @@
         });
 
         transcribeButton.addEventListener('click', () => {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
             sendAudioToServer(audioBlob);
         });
 
         function sendAudioToServer(audioBlob) {
             const formData = new FormData();
-            formData.append('audioFile', audioBlob, 'recording.wav');
+            formData.append('audioFile', audioBlob, 'recording.webm');
 
             fetch('/transcribe', {
                 method: 'POST',
