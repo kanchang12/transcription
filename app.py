@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 from google.cloud import speech_v1p1beta1 as speech
 from google.oauth2 import service_account
 
+
 app = Flask(__name__)
 
 """
@@ -19,13 +20,16 @@ service_key = {
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
   "client_x509_cert_url": "<client_x509_cert_url>"
 }
-"""
+
 
 # Create credentials using the service account key
 credentials = "XXX"
 
 # Set the credentials globally for all Google Cloud services
 speech_client = speech.SpeechClient(credentials=credentials)
+"""
+
+speech_client = speech.SpeechClient()
 
 @app.route('/')
 def index():
@@ -57,7 +61,7 @@ def transcribe():
 
         print("respo", response)
 
-        """
+        
 
         # Extract and return transcription
         transcription = ""
@@ -66,7 +70,7 @@ def transcribe():
         print("transcription", transcription)
 
         return jsonify(transcription=transcription.strip())
-        """
+        
 
     except Exception as e:
         return jsonify(error=str(e)), 500
