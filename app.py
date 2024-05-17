@@ -22,7 +22,7 @@ service_key = {
 """
 
 # Create credentials using the service account key
-credentials = "1650f89760684e28d699210f32eead6c46e07bc4"
+credentials = "XXX"
 
 # Set the credentials globally for all Google Cloud services
 speech_client = speech.SpeechClient(credentials=credentials)
